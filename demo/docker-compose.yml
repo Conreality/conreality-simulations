@@ -1,0 +1,32 @@
+version: '3.2'
+
+volumes:
+
+  master_data:
+
+networks:
+
+  lan:
+
+services:
+
+  master:
+    container_name: demo_master
+    image: conreality/master:latest
+    build: https://github.com/conreality/conreality-master.git
+    volumes:
+      - master_data:/srv
+    networks:
+      - lan
+    ports:
+      - '5432:5432'
+    command: ifconfig
+
+  slave:
+    image: conreality/slave:latest
+    build: https://github.com/conreality/conreality-slave.git
+    networks:
+      - lan
+    depends_on:
+      - master
+    command: ifconfig
