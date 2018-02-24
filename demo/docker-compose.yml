@@ -1,4 +1,5 @@
-version: '3.2'
+# See: https://docs.docker.com/compose/compose-file/compose-file-v2/
+version: '2.3'
 
 volumes:
 
@@ -7,6 +8,13 @@ volumes:
 networks:
 
   lan:
+    driver: bridge
+    enable_ipv6: false
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.0.0.0/16
+          gateway: 10.0.0.1
 
 services:
 
@@ -17,16 +25,18 @@ services:
     volumes:
       - master_data:/srv
     networks:
-      - lan
+      lan:
+        ipv4_address: 10.0.1.1
     ports:
       - '5432:5432'
-    command: ifconfig
+    command: postgres
 
   slave:
     image: conreality/slave:latest
     build: https://github.com/conreality/conreality-slave.git
     networks:
-      - lan
+      lan:
+        ipv4_address: 10.0.1.2
     depends_on:
       - master
-    command: ifconfig
+    command: ping master
